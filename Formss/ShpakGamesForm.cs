@@ -28,12 +28,22 @@ namespace БИ
         public static string NameGameVitrine;
 
         private SqlConnection sqlConnection;
+        static private string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-        
+        private string WhiteRead = Path.Combine(appDirectory, "Pictures", "White", "WhiteRead.png");
+        private string WhiteRec = Path.Combine(appDirectory, "Pictures", "White", "WhiteRec.png");
+        private string BestWhite = Path.Combine(appDirectory, "Pictures", "White", "BestWhite.png");
+        private string WhiteNew = Path.Combine(appDirectory, "Pictures", "White", "WhiteNew.png");
+        private string NotBigPictures = Path.Combine(appDirectory, "Pictures", "GameAvatar", "NotBigPictures.jpg");
+        private string NotPictures = Path.Combine(appDirectory, "Pictures", "GameAvatar", "NotPictures.png");
+        private string RedRead = Path.Combine(appDirectory, "Pictures", "Red", "RedRead.png");
+        private string RedRec = Path.Combine(appDirectory, "Pictures", "Red", "RedRec.png");
+        private string RedNew = Path.Combine(appDirectory, "Pictures", "Red", "RedNew.png");
+        private string TopRed = Path.Combine(appDirectory, "Pictures", "Red", "TopRed.png");
+        private string InfWhite = Path.Combine(appDirectory, "Pictures", "White", "InfWhite.png");
+        private string RedInfo = Path.Combine(appDirectory, "Pictures", "Red", "RedInfo.png");
 
         GameReviews gameReviews = new GameReviews();
-     
-        
 
         public int CountClick;
         public int CountClickd;
@@ -46,6 +56,8 @@ namespace БИ
 
         public ShpakGamesForm(DataBank user)
         {
+            
+            
             _user = user;
             InitializeComponent();
             BG_AccounteClick.Hide();
@@ -54,31 +66,74 @@ namespace БИ
             InfoPlatformsGame.Hide();
 
             comboBox1.Items.Add("Все жанры");
+            
+            PITSRead1.Image = Image.FromFile(WhiteRead);
+            PITSRead2.Image = Image.FromFile(WhiteRead);
+            PITSRead3.Image = Image.FromFile(WhiteRead);
+            PITSRead4.Image = Image.FromFile(WhiteRead);
+            PITSRead5.Image = Image.FromFile(WhiteRead);
+            PITSRead6.Image = Image.FromFile(WhiteRead);
 
-            PITSRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PITSRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PITSRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PITSRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PITSRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PITSRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-
-            PNewRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PNewRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PNewRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PNewRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PNewRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
-            PNewRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead1.Image = Image.FromFile(WhiteRead);
+            PNewRead2.Image = Image.FromFile(WhiteRead);
+            PNewRead3.Image = Image.FromFile(WhiteRead);
+            PNewRead4.Image = Image.FromFile(WhiteRead);
+            PNewRead5.Image = Image.FromFile(WhiteRead);
+            PNewRead6.Image = Image.FromFile(WhiteRead);
 
             InfoInTheSpotlight.Hide();
             InfoNew.Hide();
             InfoBest.Hide();
 
-            PInTheSpotlight.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRec.png");
-            PBest.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\BestWhite.png");
-            PNew.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteNew.png");
+            PInTheSpotlight.Image = Image.FromFile(WhiteRec);
+            PBest.Image = Image.FromFile(BestWhite);
+            PNew.Image = Image.FromFile(WhiteNew);
         }
         
-       
+        private void EntranceToReviews()
+        {
+            sqlConnection.Open();
+
+            DataTable table = new DataTable();
+
+            SqlDataAdapter adapter = new SqlDataAdapter();
+
+            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
+               sqlConnection);
+            command.Parameters.AddWithValue("@NG", NameVitrine3.Text);
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if (table.Rows.Count > 0)
+            {
+                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
+                CountClickd++;
+
+                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
+               sqlConnection);
+                command2.Parameters.AddWithValue("@NG", NameVitrine3.Text);
+                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
+                command2.ExecuteNonQuery();
+
+                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
+                table.Rows[0].ItemArray[2].ToString(),
+                table.Rows[0].ItemArray[3].ToString(),
+                table.Rows[0].ItemArray[4].ToString(),
+                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
+                table.Rows[0]["ReviewsTextGame"].ToString());
+
+                gameReviews = new GameReviews(gameinfo);
+
+                gameReviews.Show();
+                Controls.Add(gameReviews);
+                gameReviews.Location = new Point(235, 60);
+                gameReviews.BringToFront();
+                BG_AvatarAdd.BringToFront();
+                BG_AccounteClick.BringToFront();
+
+
+            }
+            sqlConnection.Close();
+        }
 
         private byte[] ImageToByteArray(Image image)
         {
@@ -113,10 +168,6 @@ namespace БИ
 
         private void ShpakGamesForm_Load(object sender, EventArgs e)
         {
-           
-           
-            
-            
             button1.Hide();
             if (_user.Admin == true)
             {
@@ -181,7 +232,7 @@ namespace БИ
 
                 if (tableBest.Rows[0]["BigPicturesGame"] == DBNull.Value)
                 {
-                    PBest1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotBigPictures.jpg");
+                    PBest1.Image = Image.FromFile(NotBigPictures);
                 }
                 else
                 {
@@ -193,7 +244,7 @@ namespace БИ
                 LinkBestName1.BringToFront();
                 PBestRead1.Parent = PBest1;
                 PBestRead1.BackColor = Color.Transparent;
-                PBestRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+                PBestRead1.Image = Image.FromFile(WhiteRead);
 
 
                 LinkBestName2.Text = tableBest.Rows[1].ItemArray[1].ToString();
@@ -203,10 +254,10 @@ namespace БИ
                 LinkBestName2.BringToFront();
                 PBestRead2.Parent = PBest2;
                 PBestRead2.BackColor = Color.Transparent;
-                PBestRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+                PBestRead2.Image = Image.FromFile(WhiteRead);
                 if (tableBest.Rows[1]["BigPicturesGame"] == DBNull.Value)
                 {
-                    PBest2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotBigPictures.jpg");
+                    PBest2.Image = Image.FromFile(NotBigPictures);
                 }
                 else
                 {
@@ -221,10 +272,10 @@ namespace БИ
                 LinkBestName3.BringToFront();
                 PBestRead3.Parent = PBest3;
                 PBestRead3.BackColor = Color.Transparent;
-                PBestRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+                PBestRead3.Image = Image.FromFile(WhiteRead);
                 if (tableBest.Rows[2]["BigPicturesGame"] == DBNull.Value)
                 {
-                    PBest3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotBigPictures.jpg");
+                    PBest3.Image = Image.FromFile(NotBigPictures);
                 }
                 else
                 {
@@ -251,7 +302,7 @@ namespace БИ
 
                 if (tableNew.Rows[0]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox1.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -267,7 +318,7 @@ namespace БИ
 
                 if (tableNew.Rows[1]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox2.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -283,7 +334,7 @@ namespace БИ
 
                 if (tableNew.Rows[2]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox3.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -299,7 +350,7 @@ namespace БИ
 
                 if (tableNew.Rows[3]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox4.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -315,7 +366,7 @@ namespace БИ
 
                 if (tableNew.Rows[4]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox5.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -331,7 +382,7 @@ namespace БИ
 
                 if (tableNew.Rows[5]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    NewPicutureBox6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    NewPicutureBox6.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -357,7 +408,7 @@ namespace БИ
 
                 if (tableITS.Rows[0]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox1.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -373,7 +424,7 @@ namespace БИ
 
                 if (tableITS.Rows[1]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox2.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -389,7 +440,7 @@ namespace БИ
 
                 if (tableITS.Rows[2]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox3.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -405,7 +456,7 @@ namespace БИ
 
                 if (tableITS.Rows[3]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox4.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -421,7 +472,7 @@ namespace БИ
 
                 if (tableITS.Rows[4]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox5.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -437,7 +488,7 @@ namespace БИ
 
                 if (tableITS.Rows[5]["AvatarPicturesGame"] == DBNull.Value)
                 {
-                    ITSPicutureBox6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\GameAvatar\\NotPictures.png");
+                    ITSPicutureBox6.Image = Image.FromFile(NotPictures);
                 }
                 else
                 {
@@ -646,7 +697,7 @@ namespace БИ
         private void InfoPictureBox_MouseEnter(object sender, EventArgs e)
         {
             InfoPlatformsGame.Show();
-            InfoPictureBox.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedInfo.png");
+            InfoPictureBox.Image = Image.FromFile(RedInfo);
         }
 
         private void pictureBox2_Click(object sender, EventArgs e)
@@ -668,194 +719,194 @@ namespace БИ
         private void InfoPictureBox_MouseLeave(object sender, EventArgs e)
         {
             InfoPlatformsGame.Hide();
-            InfoPictureBox.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\InfWhite.png");
+            InfoPictureBox.Image = Image.FromFile(InfWhite);
         }
 
         private void PITSRead1_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead1.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead1_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead1.Image = Image.FromFile(WhiteRead);
         }
 
         private void PITSRead2_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead2.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead2_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead2.Image = Image.FromFile(WhiteRead);
         }
 
         private void PITSRead3_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead3.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead3_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead3.Image = Image.FromFile(WhiteRead);
         }
 
         private void PITSRead4_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead4.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead4_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead4.Image = Image.FromFile(WhiteRead);
         }
 
         private void PITSRead5_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead5.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead5_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead5.Image = Image.FromFile(WhiteRead);
         }
 
         private void PITSRead6_MouseEnter(object sender, EventArgs e)
         {
-            PITSRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PITSRead6.Image = Image.FromFile(RedRead);
         }
 
         private void PITSRead6_MouseLeave(object sender, EventArgs e)
         {
-            PITSRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PITSRead6.Image = Image.FromFile(WhiteRead);
         }
 
         private void PBestRead1_MouseEnter(object sender, EventArgs e)
         {
-            PBestRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PBestRead1.Image = Image.FromFile(RedRead);
         }
 
         private void PBestRead1_MouseLeave(object sender, EventArgs e)
         {
-            PBestRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PBestRead1.Image = Image.FromFile(WhiteRead);
         }
 
         private void PBestRead2_MouseEnter(object sender, EventArgs e)
         {
-            PBestRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PBestRead2.Image = Image.FromFile(RedRead);
         }
 
         private void PBestRead2_MouseLeave(object sender, EventArgs e)
         {
-            PBestRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PBestRead2.Image = Image.FromFile(WhiteRead);
         }
 
         private void PBestRead3_MouseEnter(object sender, EventArgs e)
         {
-            PBestRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PBestRead3.Image = Image.FromFile(RedRead);
         }
 
         private void PBestRead3_MouseLeave(object sender, EventArgs e)
         {
-            PBestRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PBestRead3.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNew_MouseEnter(object sender, EventArgs e)
         {
-            PNew.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedNew.png");
+            PNew.Image = Image.FromFile(RedNew);
             InfoNew.Show();
 
         }
 
         private void PNew_MouseLeave(object sender, EventArgs e)
         {
-            PNew.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteNew.png");
+            PNew.Image = Image.FromFile(WhiteNew);
             InfoNew.Hide();
         }
 
         private void PInTheSpotlight_MouseEnter(object sender, EventArgs e)
         {
-            PInTheSpotlight.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRec.png");
+            PInTheSpotlight.Image = Image.FromFile(RedRec);
             InfoInTheSpotlight.Show();
         }
 
         private void PInTheSpotlight_MouseLeave(object sender, EventArgs e)
         {
-            PInTheSpotlight.Image = Image.FromFile(" C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRec.png");
+            PInTheSpotlight.Image = Image.FromFile(WhiteRec);
             InfoInTheSpotlight.Hide();
         }
 
         private void PBest_MouseEnter(object sender, EventArgs e)
         {
-            PBest.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\TopRed.png");
+            PBest.Image = Image.FromFile(TopRed);
             InfoBest.Show();
         }
 
         private void PBest_MouseLeave(object sender, EventArgs e)
         {
-            PBest.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\BestWhite.png");
+            PBest.Image = Image.FromFile(BestWhite);
             InfoBest.Hide();
         }
 
         private void PNewRead1_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead1.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead1_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead1.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead1.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNewRead2_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead2.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead2_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead2.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead2.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNewRead3_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead3.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead3_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead3.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead3.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNewRead4_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead4.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead4_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead4.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead4.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNewRead5_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead5.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead5_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead5.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead5.Image = Image.FromFile(WhiteRead);
         }
 
         private void PNewRead6_MouseEnter(object sender, EventArgs e)
         {
-            PNewRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\Red\\RedRead.png");
+            PNewRead6.Image = Image.FromFile(RedRead);
         }
 
         private void PNewRead6_MouseLeave(object sender, EventArgs e)
         {
-            PNewRead6.Image = Image.FromFile("C:\\Users\\-\\source\\repos\\БИ\\Pictures\\White\\WhiteRead.png");
+            PNewRead6.Image = Image.FromFile(WhiteRead);
         }
 
         private async void BestGameButtonLeft_Click(object sender, EventArgs e)
@@ -1005,2376 +1056,226 @@ namespace БИ
 
         private void LinkBestName1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-                
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void LinkBestName2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void LinkBestName3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PBestRead1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PBestRead2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PBestRead3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PBest1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
         private void PBest2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PBest3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", LinkBestName3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameITSVitrine1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameITSVitrine2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameVitrine3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameITSVitrine4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameITSVitrine5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameITSVitrine6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NameNewVitrine6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead4_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead5_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PITSRead6_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead4_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead5_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void PNewRead6_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox4_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox5_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void ITSPicutureBox6_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameITSVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox1_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine1.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox2_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine2.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox3_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine3.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox4_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine4.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox5_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine5.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-
-                gameReviews = new GameReviews(gameinfo);
-
-
-
-
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-
-
-
-
-
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
 
         private void NewPicutureBox6_Click(object sender, EventArgs e)
         {
-            sqlConnection.Open();
-
-            DataTable table = new DataTable();
-
-            SqlDataAdapter adapter = new SqlDataAdapter();
-
-            SqlCommand command = new SqlCommand("SELECT * FROM GameInfo WHERE NameGame=@NG ",
-               sqlConnection);
-            command.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count > 0)
-            {
-                int CountEnterClick = Convert.ToInt32(table.Rows[0]["CountEnterGame"]);
-                CountClickd++;
-
-                SqlCommand command2 = new SqlCommand("UPDATE GameInfo SET CountEnterGame = @CountEnterGame WHERE NameGame=@NG ",
-               sqlConnection);
-                command2.Parameters.AddWithValue("@NG", NameNewVitrine6.Text);
-                command2.Parameters.AddWithValue("CountEnterGame", CountEnterClick++);
-                command2.ExecuteNonQuery();
-
-                var gameinfo = new DataBank(table.Rows[0].ItemArray[1].ToString(),
-                table.Rows[0].ItemArray[2].ToString(),
-                table.Rows[0].ItemArray[3].ToString(),
-                table.Rows[0].ItemArray[4].ToString(),
-                Convert.ToDateTime(table.Rows[0].ItemArray[5]),
-                table.Rows[0]["ReviewsTextGame"].ToString());
-
-                gameReviews = new GameReviews(gameinfo);
-
-                gameReviews.Show();
-                Controls.Add(gameReviews);
-                gameReviews.Location = new Point(235, 60);
-                gameReviews.BringToFront();
-                BG_AvatarAdd.BringToFront();
-                BG_AccounteClick.BringToFront();
-            }
-            sqlConnection.Close();
+            EntranceToReviews();
         }
     }
 }
